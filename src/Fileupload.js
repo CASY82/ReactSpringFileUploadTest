@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import FileUploadService from "./FileUploadService";
 import UploadService from "./FileUploadService";
 
 const UploadFiles = () => {
@@ -13,12 +14,18 @@ const UploadFiles = () => {
       };
 
     const uploadFiles = () => {
-        const files = Array.from(selectedFiles);
-        let _progressInfos = files.map(file => ({ percentage: 0, fileName: file.name }));
-        progressInfosRef.current = {
-          val: _progressInfos,
+        if(selectedFiles != null){
+          const files = Array.from(selectedFiles);
+          let _progressInfos = files.map(file => ({ percentage: 0, fileName: file.name }));
+          progressInfosRef.current = {
+            val: _progressInfos,
+          }
+
+          const uploadPromises = files.map((file, i) => upload(i, file));
         }
-        const uploadPromises = files.map((file, i) => upload(i, file));
+        else{
+          const uploadPromises = FileUploadService.upload_nonFile();
+        }
         setMessage([]);
       };
 
@@ -82,7 +89,7 @@ const UploadFiles = () => {
           <div className="col-4">
             <button
               className="btn btn-success btn-sm"
-              disabled={!selectedFiles}
+              // disabled={!selectedFiles}
               onClick={uploadFiles}
             >
               Upload
