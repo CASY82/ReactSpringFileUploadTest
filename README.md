@@ -1,3 +1,69 @@
+
+BackEnd Source
+
+@PostMapping(value = "/insertBoard")
+   public String insertBoardPOST(
+         @RequestParam(value = "file", required = false) List<MultipartFile> multipartFiles,
+         @RequestPart(value = "testobject", required = false) BoardVO boardVO
+//         @RequestParam("testcontent") String testcontent
+         ) throws JsonProcessingException {
+      String path = "";
+      log.info("BoardController-insertBoardPOST 호출2 : 저장 시도 첨부파일 : " + multipartFiles + "\n");
+//      log.info("BoardController-insertBoardPOST 호출2 : 저장 시도 첨부파일 : " + boardVO + ", " + testcontent + "\n");
+      log.info("BoardController-insertBoardPOST 호출2 : 저장 시도 첨부파일 : " + boardVO);
+      if (multipartFiles != null) {
+         BoardImageVO boardImageVO = new BoardImageVO();
+         List<BoardImageVO> imageList = new ArrayList<BoardImageVO>();
+         for(MultipartFile file : multipartFiles) {
+            log.info("새로운 BoardImageVO file: " + file);
+            String saveName2 = file.getOriginalFilename();
+            log.info("saveName : " + saveName2);
+         }
+         log.info("새로운 BoardImageVO 객체 생성 완료 : " + boardImageVO);
+         try {
+            if (os.contains("win")) {
+               path = "C:/image/";
+               log.info("wind path");
+            } else {
+               path = "/resources/Back/";
+               log.info("linux path");
+            }
+            String saveName = Long.toString(System.nanoTime()) + "_" + multipartFiles.get(0).getOriginalFilename();
+            log.info("saveName : " + saveName);
+
+            if (path != null && path != "") {
+               File target = new File(path, saveName);
+               int boardMaxIdx = boardService.selectMaxIdx();
+               multipartFiles.get(0).transferTo(target);
+               boardImageVO.setBoardImage_oriName(multipartFiles.get(0).getOriginalFilename());
+               log.info("생성한 BoardImageVO 객체 내 BoardImage_oriName set완료 : " + boardImageVO);
+               boardImageVO.setBoardImage_saveName(saveName);
+               log.info("생성한 BoardImageVO 객체 내 BoardImage_saveName set완료 : " + boardImageVO);
+               boardImageVO.setBoard_idx(boardMaxIdx);
+//               boardImageService.insertBoardImage(boardImageVO);
+               log.info("board_idx 외래키 set 작업한 BoardImageVO 저장 \n");
+            }
+         } catch (IOException e) {
+            e.printStackTrace();
+         }
+      } // if (multipartFile != null && multipartFile.getSize() > 0) {
+      return "return";
+   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

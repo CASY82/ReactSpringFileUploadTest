@@ -6,62 +6,100 @@ const UploadFiles = () => {
     const [selectedFiles, setSelectedFiles] = useState(undefined);
     const [progressInfos, setProgressInfos] = useState({ val: [] });
     const [message, setMessage] = useState([]);
+    const [title, setTitle] = useState('');
+    const [content, setContent] = useState('');
     const progressInfosRef = useRef(null);
-
+    const [gooddata, setGoodData]= useState([]);
     const selectFiles = (event) => {
         setSelectedFiles(event.target.files);
         setProgressInfos({ val: [] });
       };
 
-    const uploadFiles = () => {
-        if(selectedFiles != null){
-          const files = Array.from(selectedFiles);
-          let _progressInfos = files.map(file => ({ percentage: 0, fileName: file.name }));
-          progressInfosRef.current = {
-            val: _progressInfos,
-          }
+    // const uploadFiles = () => {
+    //     if(selectedFiles != null){
+    //       const files = Array.from(selectedFiles);
+    //       let _progressInfos = files.map(file => ({ percentage: 0, fileName: file.name }));
+    //       progressInfosRef.current = {
+    //         val: _progressInfos,
+    //       }
 
-          const uploadPromises = files.map((file, i) => upload(i, file));
+    //       const uploadPromises = files.map((file, i) => upload(i, file));
+    //     }
+    //     else{
+    //       const uploadPromises = FileUploadService.upload_nonFile(gooddata);
+    //     }
+    //     setMessage([]);
+    //   };
+
+      const uploadFiles = () => {
+        if(selectedFiles != null){
+          const uploadPromises = upload(selectedFiles);
         }
         else{
-          const uploadPromises = FileUploadService.upload_nonFile();
+          const uploadPromises = FileUploadService.upload_nonFile(gooddata);
         }
         setMessage([]);
       };
 
-      const upload = (idx, file) => {
-        let _progressInfos = [...progressInfosRef.current.val];
-        return UploadService.upload(file, (event) => {
-          _progressInfos[idx].percentage = Math.round(
-            (100 * event.loaded) / event.total
-          );
-          setProgressInfos({ val: _progressInfos });
-        })
-          .then(() => {
-            setMessage((prevMessage) => ([
-              ...prevMessage,
-              "Uploaded the file successfully: " + file.name,
-            ]));
-          })
-          .catch(() => {
-            _progressInfos[idx].percentage = 0;
-            setProgressInfos({ val: _progressInfos });
-            setMessage((prevMessage) => ([
-              ...prevMessage,
-              "Could not upload the file: " + file.name,
-            ]));
-          });
+      // const upload = (idx, file) => {
+      //   let _progressInfos = [...progressInfosRef.current.val];
+      //   return UploadService.upload(file, gooddata, (event) => {
+      //     _progressInfos[idx].percentage = Math.round(
+      //       (100 * event.loaded) / event.total
+      //     );
+      //     setProgressInfos({ val: _progressInfos });
+      //   })
+      //     .then(() => {
+      //       setMessage((prevMessage) => ([
+      //         ...prevMessage,
+      //         "Uploaded the file successfully: " + file.name,
+      //       ]));
+      //     })
+      //     .catch(() => {
+      //       _progressInfos[idx].percentage = 0;
+      //       setProgressInfos({ val: _progressInfos });
+      //       setMessage((prevMessage) => ([
+      //         ...prevMessage,
+      //         "Could not upload the file: " + file.name,
+      //       ]));
+      //     });
+      // };
+
+      const upload = (file) => {
+        return UploadService.upload(file, gooddata)
       };
 
       useEffect(() => {
+        console.log(title);
+        console.log(content);
+        console.log(gooddata);
+        console.log(selectedFiles);
+        dataSetting(title, content);
+      }, [title, content, selectedFiles]);
 
-      }, []);
+      const changeTitle = (e) =>{
+        let { value } = e.target;
+        setTitle(value);
+      }
+
+      const changeContent = (e) =>{
+        let { value } = e.target;
+        setContent(value);
+      }
+
+      const dataSetting = (title, content) => {
+        setGoodData({
+          board_name : title,
+          board_content : content
+        })
+      }
+
 
     return (
         <div>
         <br />
-        <span>title : </span><input type="text"/><hr /> 
-        <span>content : </span><input type="textarea"/><hr />
+        <span>title : </span><input type="text" onChange={changeTitle} value={title}/><hr /> 
+        <span>content : </span><input type="textarea" onChange={changeContent} value={content}/><hr />
         {progressInfos && progressInfos.val.length > 0 &&
           progressInfos.val.map((progressInfo, index) => (
             <div className="mb-2" key={index}>
