@@ -1,6 +1,7 @@
 
 BackEnd Source
 
+```JAVA
 @PostMapping(value = "/insertBoard")
    public String insertBoardPOST(
          @RequestParam(value = "file", required = false) List<MultipartFile> multipartFiles,
@@ -50,18 +51,7 @@ BackEnd Source
       return "return";
    }
 
-
-
-
-
-
-
-
-
-
-
-
-
+'''
 
 
 # Getting Started with Create React App
